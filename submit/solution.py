@@ -67,7 +67,7 @@ data_classes = {0:"o", 1: "ki", 2: "su", 3: "tsu", 4: "na", 5: "ha",
                 6: "ma", 7: "ya", 8: "re", 9: "wo"}
 
 
-# In[186]:
+# In[140]:
 
 
 # Plotting helper functions. Don't edit these.
@@ -162,7 +162,7 @@ def plot_coefficients(coef, name):
 # If we plot the characters, we see that there is quite some variation. The same
 # character can be written in a number of different ways.
 
-# In[150]:
+# In[141]:
 
 
 # Gets indices of examples with the given class
@@ -177,7 +177,7 @@ for i in range(10):
 # ### Question 1.1: Cross-validate (1 point)
 # Implement a method `evaluate_LR` that evaluates a Logistic Regression model for a given regularization constant (C) and returns the train and test score of a 5-fold stratified cross-validation using the accuracy metric. Note: we know that Logistic Regression is not the best technique for image data :). We'll use other techniques in future assignments.
 
-# In[151]:
+# In[8]:
 
 
 # Implement
@@ -204,7 +204,7 @@ def evaluate_LR(X, y, C):
 # 
 # Implement a method `plot_curve` that plots the results of `evaluate_LR` on a 25% stratified subsample of the Kuzushiji MNIST dataset for C values ranging from 1e-8 to 1e3 (on a log scale, at least 12 values). Use `random_state=0`. You can use the plotting function `plot_live` defined above (carefully read what it does), and add any helper functions you like. Note:  To be clear, you need to pass only 25% of the data to `evaluate_LR`. Using a 25% subsample won't give you optimal performance, but this is meant to make the assignment more doable.
 
-# In[ ]:
+# In[9]:
 
 
 # Implement. Do not change the name or signature of this function.
@@ -248,7 +248,7 @@ def plot_curve(X,y):
 # - 'G': Neither underfitting nor overfitting at both values for C.
 # - 'H': No answer
 
-# In[153]:
+# In[10]:
 
 
 # Fill in the correct answer. Don't change the name of the variable
@@ -263,7 +263,7 @@ q_1_3 = 'C'
 # Note: You may get convergence warnings. If so, just increase the number of optimization iterations (`max_iter`). Especially models with high C values can take longer to converge (can you guess why?). You can also choose to ignore these warnings since they won't affect the results much.  
 # Note 2: Scikit-learn actually uses [a more sophisticated approach](https://scikit-learn.org/stable/auto_examples/linear_model/plot_logistic_multinomial.html#sphx-glr-auto-examples-linear-model-plot-logistic-multinomial-py) here than simple one-vs-all. It uses the fact that Logistic Regression predicts probabilities, and hence the probabilities of each class are taken into account (in a softmax function). It will still produce one model per class.
 
-# In[189]:
+# In[155]:
 
 
 # Implement. Do not change the name or signature of this function.
@@ -285,7 +285,7 @@ def plot_tsu_coefficients(X,y):
     
     Returns: 3 plots, as described above.
     """
-    Xs, Xs_test, ys,ys_test = train_test_split(X, y)
+    Xs, Xs_test, ys,ys_test = train_test_split(X, y, stratify=y, random_state=0)
     C_classification = [1e-6, 0.01, 10]
     for c_iter in C_classification:
         models = Inspection_LR(Xs,ys, c_iter)
@@ -299,7 +299,7 @@ def plot_tsu_coefficients(X,y):
 # ## Question 2.2: Interpretation (1 points)
 # Interpret the results. Which model works best? What is each of the models paying attention to when making predictions? Does that make sense - i.e. did the model learn something useful about the character *tsu*? Compare this to the results of question 1.2 and 1.3: does that help explain the results? Please formulate your answer in the string variable below. Keep your answer within 500 characters.
 
-# In[11]:
+# In[12]:
 
 
 q_2_2 = """
@@ -319,11 +319,10 @@ if len(q_2_2.strip()) > 500:
 # 
 # Finally, plot these examples using the `plot_examples` function, together with the predicted class (character). Create two plots (e.g. by calling `plot_examples` twice): one with 20 examples of 'tsu' characters which are predicted correctly, and a second with 20 examples of 'tsu' characters which are predicted incorrectly by this model. Indicate in the figure `title` which 'tsu' characters are correct and which ones are misclassified.
 
-# In[218]:
+# In[371]:
 
 
 # Implement. Do not change the name or signature of this function.
-
 
 def plot_mistakes(X,y):
     """ Plots two sets of images. The first set shows 20 examples of characters
@@ -333,14 +332,36 @@ def plot_mistakes(X,y):
     y -- the correct labels
     Returns: 2 sets of plots, as described above.
     """
-    X_train, X_test, y_train,y_test = train_test_split(X, y)
+    X_train, X_test, y_train,y_test = train_test_split(X, y, stratify=y, random_state=0)
+    # print(X_test.head(1))
     multi_class='multinomial'
     clf = LogisticRegression(C=1e-6, max_iter=100, multi_class = multi_class).fit(X_train,y_train)
+
+#   vector of class labels for each sample
     y_pred = clf.predict(X_test)
-    correctclassified = np.nonzero(y_pred == list(y_test))[0]    
-    missclassified = np.nonzero(y_pred != list(y_test))[0]
-    plot_examples(correctclassified, labels= "",title="tsu_correct")
-    plot_examples(missclassified, labels= "",title="tsu_correct")
+    
+#   test data for real tsu
+    X_real_tsu = X_test[y_test.values == '3']  
+    
+#   y_test for real tsu with data number and feature data > series
+    y_real_tsu = y_test[y_test.values == '3']
+    
+#   y_test for real tsu with only index
+    y_real_tsu_index = np.nonzero(y_test.values == '3')[0]
+    
+#   y_pred with the prediction of true samples > array
+    y_real_tsu_pred = y_pred[y_real_tsu_index]
+
+#   to test the prediction right or wrong
+#   the index of x_test
+    correctclassified = np.nonzero(y_real_tsu_pred == list(y_real_tsu))[0]
+    missclassified = np.nonzero(y_real_tsu_pred != list(y_real_tsu))[0]
+
+#  pick the first 20 index
+    correct_example = correctclassified[:20]
+    wrong_example = missclassified[:20]
+    plot_examples(X_real_tsu.values[correct_example], labels=y_real_tsu_pred[correct_example], title="tsu_correct")
+    plot_examples(X_real_tsu.values[wrong_example], labels=y_real_tsu_pred[wrong_example], title="tsu_wrong")
     pass
 # plot_mistakes(X,y)
 
