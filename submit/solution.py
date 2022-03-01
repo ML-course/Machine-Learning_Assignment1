@@ -27,7 +27,7 @@ if 'google.colab' in str(get_ipython()):
 # 
 # The dataset that we will use contains scanned 28-by-28 pixel images of such handwritten characters. Actually, only 10 of those characters.
 
-# In[3]:
+# In[1]:
 
 
 # imports
@@ -51,7 +51,7 @@ else:
     print("OK. You may continue :)")
 
 
-# In[4]:
+# In[2]:
 
 
 # Download Kuzushiji-MNIST data. Takes a while the first time.
@@ -67,7 +67,7 @@ data_classes = {0:"o", 1: "ki", 2: "su", 3: "tsu", 4: "na", 5: "ha",
                 6: "ma", 7: "ya", 8: "re", 9: "wo"}
 
 
-# In[5]:
+# In[3]:
 
 
 # Plotting helper functions. Don't edit these.
@@ -162,7 +162,7 @@ def plot_coefficients(coef, name):
 # If we plot the characters, we see that there is quite some variation. The same
 # character can be written in a number of different ways.
 
-# In[6]:
+# In[4]:
 
 
 # Gets indices of examples with the given class
@@ -177,12 +177,16 @@ for i in range(10):
 # ### Question 1.1: Cross-validate (1 point)
 # Implement a method `evaluate_LR` that evaluates a Logistic Regression model for a given regularization constant (C) and returns the train and test score of a 5-fold stratified cross-validation using the accuracy metric. Note: we know that Logistic Regression is not the best technique for image data :). We'll use other techniques in future assignments.
 
-# In[7]:
+# In[17]:
 
 
 # Implement
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_validate
+from sklearn.svm import LinearSVC
+
 def evaluate_LR(X, y, C):
-    """ Evaluate an SVM with 5-fold cross-validation on the provided (X, y) data. 
+    """ Evaluate an Logistic Regression with 5-fold cross-validation on the provided (X, y) data. 
     Keyword arguments:
     X -- the data for training and testing
     y -- the correct labels
@@ -190,7 +194,15 @@ def evaluate_LR(X, y, C):
     
     Returns: a dictionary with the mean train and test score, e.g. {"train": 0.9, "test": 0.95}
     """
-    pass
+    scores = cross_validate(LogisticRegression(C=C), X, y, cv=5, return_train_score= True, n_jobs=-1)
+    mean_train_test = {"train": np.mean(scores["train_score"]), "test": np.mean(scores["test_score"])}
+    return mean_train_test
+
+
+# In[18]:
+
+
+print(evaluate_LR(X, y, 1.0))
 
 
 # ### Question 1.2: Tune (1 points)
