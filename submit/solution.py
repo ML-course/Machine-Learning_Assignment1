@@ -2,14 +2,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 # Fill in your name using the given format
 your_name = "Nien, Ting Yu"
 
 
-# In[3]:
+# In[2]:
 
 
 # For use in colab
@@ -27,7 +27,7 @@ if 'google.colab' in str(get_ipython()):
 # 
 # The dataset that we will use contains scanned 28-by-28 pixel images of such handwritten characters. Actually, only 10 of those characters.
 
-# In[4]:
+# In[3]:
 
 
 # imports
@@ -51,7 +51,7 @@ else:
     print("OK. You may continue :)")
 
 
-# In[5]:
+# In[4]:
 
 
 # Download Kuzushiji-MNIST data. Takes a while the first time.
@@ -67,7 +67,7 @@ data_classes = {0:"o", 1: "ki", 2: "su", 3: "tsu", 4: "na", 5: "ha",
                 6: "ma", 7: "ya", 8: "re", 9: "wo"}
 
 
-# In[140]:
+# In[5]:
 
 
 # Plotting helper functions. Don't edit these.
@@ -162,7 +162,7 @@ def plot_coefficients(coef, name):
 # If we plot the characters, we see that there is quite some variation. The same
 # character can be written in a number of different ways.
 
-# In[141]:
+# In[6]:
 
 
 # Gets indices of examples with the given class
@@ -177,7 +177,7 @@ for i in range(10):
 # ### Question 1.1: Cross-validate (1 point)
 # Implement a method `evaluate_LR` that evaluates a Logistic Regression model for a given regularization constant (C) and returns the train and test score of a 5-fold stratified cross-validation using the accuracy metric. Note: we know that Logistic Regression is not the best technique for image data :). We'll use other techniques in future assignments.
 
-# In[8]:
+# In[7]:
 
 
 # Implement
@@ -204,7 +204,7 @@ def evaluate_LR(X, y, C):
 # 
 # Implement a method `plot_curve` that plots the results of `evaluate_LR` on a 25% stratified subsample of the Kuzushiji MNIST dataset for C values ranging from 1e-8 to 1e3 (on a log scale, at least 12 values). Use `random_state=0`. You can use the plotting function `plot_live` defined above (carefully read what it does), and add any helper functions you like. Note:  To be clear, you need to pass only 25% of the data to `evaluate_LR`. Using a 25% subsample won't give you optimal performance, but this is meant to make the assignment more doable.
 
-# In[9]:
+# In[8]:
 
 
 # Implement. Do not change the name or signature of this function.
@@ -248,7 +248,7 @@ def plot_curve(X,y):
 # - 'G': Neither underfitting nor overfitting at both values for C.
 # - 'H': No answer
 
-# In[10]:
+# In[9]:
 
 
 # Fill in the correct answer. Don't change the name of the variable
@@ -263,17 +263,13 @@ q_1_3 = 'C'
 # Note: You may get convergence warnings. If so, just increase the number of optimization iterations (`max_iter`). Especially models with high C values can take longer to converge (can you guess why?). You can also choose to ignore these warnings since they won't affect the results much.  
 # Note 2: Scikit-learn actually uses [a more sophisticated approach](https://scikit-learn.org/stable/auto_examples/linear_model/plot_logistic_multinomial.html#sphx-glr-auto-examples-linear-model-plot-logistic-multinomial-py) here than simple one-vs-all. It uses the fact that Logistic Regression predicts probabilities, and hence the probabilities of each class are taken into account (in a softmax function). It will still produce one model per class.
 
-# In[155]:
+# In[20]:
 
 
 # Implement. Do not change the name or signature of this function.
-
-
 def Inspection_LR(X, y, c_iter):
     multi_class='multinomial'
     clf = LogisticRegression(C=c_iter, max_iter=100, multi_class = multi_class).fit(X,y)
-    # acc = clf.score(Xs_test,ys_test)
-    # return clf.coef_[3], acc
     return clf
     pass
 
@@ -285,7 +281,7 @@ def plot_tsu_coefficients(X,y):
     
     Returns: 3 plots, as described above.
     """
-    Xs, Xs_test, ys,ys_test = train_test_split(X, y, stratify=y, random_state=0)
+    Xs, Xs_test, ys,ys_test = train_test_split(X, y)
     C_classification = [1e-6, 0.01, 10]
     for c_iter in C_classification:
         models = Inspection_LR(Xs,ys, c_iter)
@@ -319,11 +315,11 @@ if len(q_2_2.strip()) > 500:
 # 
 # Finally, plot these examples using the `plot_examples` function, together with the predicted class (character). Create two plots (e.g. by calling `plot_examples` twice): one with 20 examples of 'tsu' characters which are predicted correctly, and a second with 20 examples of 'tsu' characters which are predicted incorrectly by this model. Indicate in the figure `title` which 'tsu' characters are correct and which ones are misclassified.
 
-# In[371]:
+# In[64]:
 
 
 # Implement. Do not change the name or signature of this function.
-
+import random
 def plot_mistakes(X,y):
     """ Plots two sets of images. The first set shows 20 examples of characters
     predicted correctly by a Logistic Regression classifier with C=1e-6. The 
@@ -332,8 +328,7 @@ def plot_mistakes(X,y):
     y -- the correct labels
     Returns: 2 sets of plots, as described above.
     """
-    X_train, X_test, y_train,y_test = train_test_split(X, y, stratify=y, random_state=0)
-    # print(X_test.head(1))
+    X_train, X_test, y_train,y_test = train_test_split(X, y)
     multi_class='multinomial'
     clf = LogisticRegression(C=1e-6, max_iter=100, multi_class = multi_class).fit(X_train,y_train)
 
@@ -356,10 +351,12 @@ def plot_mistakes(X,y):
 #   the index of x_test
     correctclassified = np.nonzero(y_real_tsu_pred == list(y_real_tsu))[0]
     missclassified = np.nonzero(y_real_tsu_pred != list(y_real_tsu))[0]
-
 #  pick the first 20 index
-    correct_example = correctclassified[:20]
-    wrong_example = missclassified[:20]
+    # correct_example = correctclassified[:20]
+    # wrong_example = missclassified[:20]
+    correct_example = np.random.choice(correctclassified, 20)
+    wrong_example = np.random.choice(missclassified, 20)
+    
     plot_examples(X_real_tsu.values[correct_example], labels=y_real_tsu_pred[correct_example], title="tsu_correct")
     plot_examples(X_real_tsu.values[wrong_example], labels=y_real_tsu_pred[wrong_example], title="tsu_wrong")
     pass
@@ -393,7 +390,7 @@ if len(q_3_2.strip()) > 500:
 # 
 # Both words consist of two characters as shown below. The first two characters form the first word and the last two form the second.
 
-# In[14]:
+# In[65]:
 
 
 # Uncomment this code if you don't have the mystery_characters.npy file.
@@ -406,7 +403,7 @@ if len(q_3_2.strip()) > 500:
 temple_data = np.load('mystery_characters.npy')
 
 
-# In[15]:
+# In[66]:
 
 
 # plot_examples(temple_data[0:2], None, row_length=2,title="Word 1")
@@ -417,7 +414,7 @@ temple_data = np.load('mystery_characters.npy')
 # 
 # Hint: You can use Google Translate if you don't know Japanese. Enter the words in Google Translate without spaces between the characters. There may be multiple meanings for a word, you can pick the one that fits the sentence best.
 
-# In[16]:
+# In[67]:
 
 
 # Implement. Do not change the name or signature of this function.
@@ -427,13 +424,19 @@ def predict_characters(X, y, X_test):
     y -- the correct labels
     X_test -- the new input images as 1D arrays
     """
+    model = Inspection_LR(X,y, c_iter=1e-6)
+    y_pred = model.predict(X_test)
+    
+    for i in y_pred:
+        print(data_classes[int(i)])
+
     pass
 
 predict_characters(X, y, temple_data)
 
 # Fill in the correct meaning
-q_4_word_1 = "??"
-q_4_word_2 = "??"
+q_4_word_1 = "Moon"
+q_4_word_2 = "mountain"
 
 print("The sentence is : {} looks beautiful over the {}.".format(q_4_word_1,q_4_word_2))
 
@@ -477,4 +480,4 @@ def evaluate_hog_lr(X,y):
 # Don't forget to tune the LogisticRegression hyperparameters. This can be done 
 # offline, don't tune them inside evaluate_hog_lr.
 
-last_edit = 'March 1, 2022'
+last_edit = 'March 2, 2022'
