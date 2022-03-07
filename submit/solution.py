@@ -2,14 +2,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 
 # Fill in your name using the given format
 your_name = "Nien, Ting Yu"
 
 
-# In[2]:
+# In[3]:
 
 
 # For use in colab
@@ -27,7 +27,7 @@ if 'google.colab' in str(get_ipython()):
 # 
 # The dataset that we will use contains scanned 28-by-28 pixel images of such handwritten characters. Actually, only 10 of those characters.
 
-# In[3]:
+# In[4]:
 
 
 # imports
@@ -51,7 +51,7 @@ else:
     print("OK. You may continue :)")
 
 
-# In[4]:
+# In[5]:
 
 
 # Download Kuzushiji-MNIST data. Takes a while the first time.
@@ -67,7 +67,7 @@ data_classes = {0:"o", 1: "ki", 2: "su", 3: "tsu", 4: "na", 5: "ha",
                 6: "ma", 7: "ya", 8: "re", 9: "wo"}
 
 
-# In[5]:
+# In[6]:
 
 
 # Plotting helper functions. Don't edit these.
@@ -162,7 +162,7 @@ def plot_coefficients(coef, name):
 # If we plot the characters, we see that there is quite some variation. The same
 # character can be written in a number of different ways.
 
-# In[6]:
+# In[46]:
 
 
 # Gets indices of examples with the given class
@@ -177,7 +177,7 @@ for i in range(10):
 # ### Question 1.1: Cross-validate (1 point)
 # Implement a method `evaluate_LR` that evaluates a Logistic Regression model for a given regularization constant (C) and returns the train and test score of a 5-fold stratified cross-validation using the accuracy metric. Note: we know that Logistic Regression is not the best technique for image data :). We'll use other techniques in future assignments.
 
-# In[7]:
+# In[12]:
 
 
 # Implement
@@ -194,8 +194,7 @@ def evaluate_LR(X, y, C):
     
     Returns: a dictionary with the mean train and test score, e.g. {"train": 0.9, "test": 0.95}
     """
-    #max_iter=100
-    scores = cross_validate(LogisticRegression(C=C), X, y, cv=5, return_train_score= True, n_jobs=-1)
+    scores = cross_validate(LogisticRegression(C=C, max_iter=100), X, y, cv=5, return_train_score= True, n_jobs=-1)
     mean_train_test = {"train": np.mean(scores["train_score"]), "test": np.mean(scores["test_score"])}
     return mean_train_test
 
@@ -204,7 +203,7 @@ def evaluate_LR(X, y, C):
 # 
 # Implement a method `plot_curve` that plots the results of `evaluate_LR` on a 25% stratified subsample of the Kuzushiji MNIST dataset for C values ranging from 1e-8 to 1e3 (on a log scale, at least 12 values). Use `random_state=0`. You can use the plotting function `plot_live` defined above (carefully read what it does), and add any helper functions you like. Note:  To be clear, you need to pass only 25% of the data to `evaluate_LR`. Using a 25% subsample won't give you optimal performance, but this is meant to make the assignment more doable.
 
-# In[8]:
+# In[13]:
 
 
 # Implement. Do not change the name or signature of this function.
@@ -263,7 +262,7 @@ q_1_3 = 'C'
 # Note: You may get convergence warnings. If so, just increase the number of optimization iterations (`max_iter`). Especially models with high C values can take longer to converge (can you guess why?). You can also choose to ignore these warnings since they won't affect the results much.  
 # Note 2: Scikit-learn actually uses [a more sophisticated approach](https://scikit-learn.org/stable/auto_examples/linear_model/plot_logistic_multinomial.html#sphx-glr-auto-examples-linear-model-plot-logistic-multinomial-py) here than simple one-vs-all. It uses the fact that Logistic Regression predicts probabilities, and hence the probabilities of each class are taken into account (in a softmax function). It will still produce one model per class.
 
-# In[20]:
+# In[ ]:
 
 
 # Implement. Do not change the name or signature of this function.
@@ -295,11 +294,11 @@ def plot_tsu_coefficients(X,y):
 # ## Question 2.2: Interpretation (1 points)
 # Interpret the results. Which model works best? What is each of the models paying attention to when making predictions? Does that make sense - i.e. did the model learn something useful about the character *tsu*? Compare this to the results of question 1.2 and 1.3: does that help explain the results? Please formulate your answer in the string variable below. Keep your answer within 500 characters.
 
-# In[12]:
+# In[44]:
 
 
 q_2_2 = """
-        Your answer 
+        The model with C=1e-6 works best. The high values for coefficients(bright pixels) and low values(dark pixels) represent that the model learns 'tsu' that blow up outline shape and suppress the middle part. Compare to question 1.2 and 1.3, although the model has an optimum when C=1e-3, it fits good with C between 1e-6~1e-3, and then start overfitting. It helps explain that C=10, C=0.01 are overfitting. Even though their accuracy are high, it cannot be generalized to other data(not train data).
         """
 
 if len(q_2_2.strip()) > 500:
@@ -315,7 +314,7 @@ if len(q_2_2.strip()) > 500:
 # 
 # Finally, plot these examples using the `plot_examples` function, together with the predicted class (character). Create two plots (e.g. by calling `plot_examples` twice): one with 20 examples of 'tsu' characters which are predicted correctly, and a second with 20 examples of 'tsu' characters which are predicted incorrectly by this model. Indicate in the figure `title` which 'tsu' characters are correct and which ones are misclassified.
 
-# In[64]:
+# In[45]:
 
 
 # Implement. Do not change the name or signature of this function.
@@ -352,8 +351,6 @@ def plot_mistakes(X,y):
     correctclassified = np.nonzero(y_real_tsu_pred == list(y_real_tsu))[0]
     missclassified = np.nonzero(y_real_tsu_pred != list(y_real_tsu))[0]
 #  pick the first 20 index
-    # correct_example = correctclassified[:20]
-    # wrong_example = missclassified[:20]
     correct_example = np.random.choice(correctclassified, 20)
     wrong_example = np.random.choice(missclassified, 20)
     
@@ -366,11 +363,11 @@ def plot_mistakes(X,y):
 # ## Question 3.2: Interpretation (1 point)
 # Interpret the results. Can you explain which kinds of 'tsu' characters are predicted correctly and which ones are not? Compare this with what you observed in question 2.1 and 2.2. What does that tell you about the model? Please formulate your answer in the string variable below. Keep your answer within 500 characters.
 
-# In[13]:
+# In[53]:
 
 
 q_3_2 = """
-        Your answer 
+        Most of 'tsu' with a clear outline and empty middle part, a circle with a missing corner, are predicted correctly, and the ones with a shape similar to two vertical lines are often predicted incorrectly. Compared with question 2, since the model learned 'tsu' as a defective circle shape mostly, it is hard to predict another shape correctly. However, these two shapes have a large difference for this simple model now to differenciate.
         """
 
 if len(q_3_2.strip()) > 500:
@@ -390,7 +387,7 @@ if len(q_3_2.strip()) > 500:
 # 
 # Both words consist of two characters as shown below. The first two characters form the first word and the last two form the second.
 
-# In[65]:
+# In[17]:
 
 
 # Uncomment this code if you don't have the mystery_characters.npy file.
@@ -403,7 +400,7 @@ if len(q_3_2.strip()) > 500:
 temple_data = np.load('mystery_characters.npy')
 
 
-# In[66]:
+# In[18]:
 
 
 # plot_examples(temple_data[0:2], None, row_length=2,title="Word 1")
@@ -414,18 +411,20 @@ temple_data = np.load('mystery_characters.npy')
 # 
 # Hint: You can use Google Translate if you don't know Japanese. Enter the words in Google Translate without spaces between the characters. There may be multiple meanings for a word, you can pick the one that fits the sentence best.
 
-# In[67]:
+# In[22]:
 
 
 # Implement. Do not change the name or signature of this function.
+
 def predict_characters(X, y, X_test):
     """ Print the class names for all the images in X.
     X -- the data for training and testing
     y -- the correct labels
     X_test -- the new input images as 1D arrays
     """
-    model = Inspection_LR(X,y, c_iter=1e-6)
-    y_pred = model.predict(X_test)
+#   based on Q1.2, model is good with C between 1e-6~1e-3, but the accuracy is better when C=1e-3, so here use C=1e-3
+    clf = LogisticRegression(C=1e-3).fit(X,y)
+    y_pred = clf.predict(X_test)
     
     for i in y_pred:
         print(data_classes[int(i)])
@@ -480,4 +479,4 @@ def evaluate_hog_lr(X,y):
 # Don't forget to tune the LogisticRegression hyperparameters. This can be done 
 # offline, don't tune them inside evaluate_hog_lr.
 
-last_edit = 'March 2, 2022'
+last_edit = 'March 6, 2022'
